@@ -45,10 +45,11 @@ def follow_account(username, password, target):
     time.sleep(2)
 
 
-    follow_button = driver.find_elements(By.TAG_NAME, 'button')[1]
+    follow_button = driver.find_elements(By.TAG_NAME, 'button')
 
     if follow_button:
-        follow_button.click()
+        follow_button[0].click()
+        follow_button[1].click()
         print("[TRUE] User -> " + target + " has been followed")
         time.sleep(3)
     else:
