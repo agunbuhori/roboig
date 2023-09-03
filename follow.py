@@ -11,13 +11,15 @@ from selenium.common.exceptions import NoSuchElementException
 import sys
 
 
+
 def follow_account(username, password, target):
     # Set up ChromeDriver options
     chrome_options = Options()
     # chrome_options.add_argument("--headless")  # Run Chrome in headless mode
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-
+    chrome_options.add_argument("--headless")
+    
     # Set up ChromeDriver service
     service = Service(ChromeDriverManager().install())
 
