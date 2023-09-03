@@ -19,7 +19,7 @@ def follow_account(username, password, target):
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--headless")
-    
+
     # Set up ChromeDriver service
     service = Service(ChromeDriverManager().install())
 
@@ -36,7 +36,7 @@ def follow_account(username, password, target):
     username_input.send_keys(username)
     password_input.send_keys(password)
     password_input.send_keys(Keys.RETURN)
-    time.sleep(5)
+    time.sleep(3)
 
     # Like stories of each follower
     # for follower in usernames:
@@ -50,7 +50,7 @@ def follow_account(username, password, target):
     if follow_button:
         follow_button.click()
         print("[TRUE] User -> " + target + " has been followed")
-        time.sleep(5)
+        time.sleep(3)
     else:
         print("[FALSE] User -> " + target + " has no story up.")
         # continue
