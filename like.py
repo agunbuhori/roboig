@@ -1,6 +1,4 @@
 import time
-import os
-import fileinput
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -10,7 +8,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import NoSuchElementException
 import sys
 
-def follow_account(username, password, target):
+def follow_post(username, password, target):
     # Set up ChromeDriver options
     chrome_options = Options()
     chrome_options.add_argument("--no-sandbox")
@@ -34,20 +32,13 @@ def follow_account(username, password, target):
 
     # Like stories of each follower
     # for follower in usernames:
-    profile_url = f"https://www.instagram.com/{target}"
-    driver.get(profile_url)
-    time.sleep(3)
+    driver.get(target)
+    time.sleep(2)
 
-    header = driver.find_element(By.TAG_NAME, 'header')
-    buttons = header.find_elements(By.TAG_NAME, 'button')
-    
     try:
-        # Iterate through the buttons and click each one
-        for button in buttons:
-            button.click()
-            print("Following...")
-
-        print(f"Followed")
+        like_button = driver.find_element(By.XPATH, "/html/body/div[2]/div/div/div[2]/div/div/div/div[1]/div[1]/div[2]/section/main/div/div[1]/div/div[2]/div/div[3]/div[1]/div[1]/span[1]/div")
+        like_button.click()
+        print("Clicked")
         time.sleep(3)
         driver.quit()
     except Exception as e:
@@ -57,7 +48,7 @@ def follow_account(username, password, target):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Usage: python follow.py accounts.txt <target>")
+        print("Usage: python like.py accounts.txt <target>")
         sys.exit(1)
 
     target = sys.argv[2]
@@ -67,4 +58,4 @@ if __name__ == "__main__":
             account_info = line.strip().split()
             if len(account_info) == 2:
                 username, password = account_info
-                follow_account(username, password, target)
+                follow_post(username, password, target)

@@ -1,22 +1,28 @@
 import time
-import os
-import fileinput
+import random
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import StaleElementReferenceException
 import sys
 
-def follow_account(username, password, target):
+def get_random_comment(filename):
+    with open(filename, 'r') as file:
+        comments = file.read().splitlines()
+    return random.choice(comments)
+
+def comment_post(username, password, target, comment_file):
     # Set up ChromeDriver options
     chrome_options = Options()
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_experimental_option("detach", True)
-    chrome_options.add_argument("--headless")
+
+    # chrome_options.add_argument("--headless")
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
 
@@ -30,41 +36,41 @@ def follow_account(username, password, target):
     username_input.send_keys(username)
     password_input.send_keys(password)
     password_input.send_keys(Keys.RETURN)
+
+    time.sleep(3)
+    driver.get(target)
     time.sleep(3)
 
-    # Like stories of each follower
-    # for follower in usernames:
-    profile_url = f"https://www.instagram.com/{target}"
-    driver.get(profile_url)
-    time.sleep(3)
-
-    header = driver.find_element(By.TAG_NAME, 'header')
-    buttons = header.find_elements(By.TAG_NAME, 'button')
-    
     try:
-        # Iterate through the buttons and click each one
-        for button in buttons:
-            button.click()
-            print("Following...")
+        max_retries = 3
+        retries = 0
+        comment = get_random_comment(comment_file)
 
-        print(f"Followed")
-        time.sleep(3)
-        driver.quit()
+        while retries < max_retries:
+            try:
+                element = driver.find_element(By.TAG_NAME, "textarea")
+                element.click()
+                element.send_keys(comment)
+                element.send_keys(Keys.RETURN)
+                break  # Exit the loop if the click is successful
+            except StaleElementReferenceException:
+                retries += 1
     except Exception as e:
-        print(f"Failed")
+        print(e)
         time.sleep(3)
         driver.quit()
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: python follow.py accounts.txt <target>")
+    if len(sys.argv) != 4:
+        print("Usage: python follow.py accounts.txt <target> comments.txt")
         sys.exit(1)
 
     target = sys.argv[2]
+    comment_file = sys.argv[3]
 
     with open('accounts.txt', 'r') as file:
         for line in file:
             account_info = line.strip().split()
             if len(account_info) == 2:
                 username, password = account_info
-                follow_account(username, password, target)
+                comment_post(username, password, target, comment_file)
